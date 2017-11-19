@@ -176,7 +176,7 @@ strike
 spectrum
 sphere
 spice
-sprial
+spiral
 spoon
 square
 staircase
