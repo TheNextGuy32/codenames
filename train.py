@@ -51,4 +51,65 @@ def printBoard(board, longestWordLength):
 	print("")
 
 board, longestWordLength = createBoard()
-printBoard(board,longestWordLength)
+
+def generateHint(board, keyCard):
+	return "Ballroom 1"
+
+def isGameComplete(board):
+	return 0
+
+def guessCoordinate(x,y,board,keyCard):
+	z = (y*5)+x
+	agentType = keyCard[z]
+	if agentType == 0:
+		#  Neutral
+		print("%s was NEUTRAL! Too bad!" % board[z])
+		board[z] = "NEU"
+	elif agentType == 1:
+		#  Blue
+		print("%s was a BLU agent! Good job!" % board[z])
+		board[z] = "BLU"
+	elif agentType == 2:
+		#  Red
+		print("%s was a RED agent! Too bad!" % board[z])
+		board[z] = "RED"
+	else:
+		#  Assassin
+		print("%s was an assassin! You lose!" % board[z])
+		board[z] = "DIE"
+		return 1
+		
+	return isGameComplete(board)
+
+def game(board,keyCard):
+	print("Welcome to Codenames!\n")
+	print("Use the computer generated hints to try to find your agents!")
+	print("Input the coordinate of the codename you think the bot is referring to.")
+	print("Input is X: 0-4 and Y: 0-4 inclusive.\n")
+	print("For instance, %s is at 0,1" % board[5])
+
+	gameComplete = 0
+	while not gameComplete:
+		printBoard(board,longestWordLength)
+		print("Hint: %s" % generateHint(board,keyCard))	
+		x = -1
+		y = -1
+		while x == -1 or y == -1:
+			response = input()
+			if len(response) != 3:
+				print("Response must be in 1,2 format.")
+				pass
+			
+			coords = response.split(',')
+			attX = int(coords[0])
+			attY = int(coords[1])
+
+			if attX > 4 or attX < 0 or attY > 4 or attX < 0:
+				print("Response coords must be 0-4 inclusive.")
+				pass
+			x = attX
+			y = attY
+		gameComplete = guessCoordinate(x,y,board,keyCard)
+
+keyCard = {}
+game(board,keyCard)
