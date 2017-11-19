@@ -1,5 +1,7 @@
 from gensim.models import Word2Vec
 import random
+import keyCardReader
+
 
 codenameFile = open("codenameList.txt",'r')
 codenames = codenameFile.readlines()
@@ -82,20 +84,26 @@ def guessCoordinate(x,y,board,keyCard):
 	return isGameComplete(board)
 
 def game(board,keyCard):
+	#  Welcome Message
 	print("Welcome to Codenames!\n")
 	print("Use the computer generated hints to try to find your agents!")
 	print("Input the coordinate of the codename you think the bot is referring to.")
 	print("Input is X: 0-4 and Y: 0-4 inclusive.\n")
 	print("For instance, %s is at 0,1" % board[5])
 
+	#  Main game loop
 	gameComplete = 0
 	while not gameComplete:
 		printBoard(board,longestWordLength)
 		print("Hint: %s" % generateHint(board,keyCard))	
+		
+		#  Keep looping until they give good input
 		x = -1
 		y = -1
 		while x == -1 or y == -1:
 			response = input()
+			
+			#  Wrong input length
 			if len(response) != 3:
 				print("Response must be in 1,2 format.")
 				pass
@@ -104,11 +112,14 @@ def game(board,keyCard):
 			attX = int(coords[0])
 			attY = int(coords[1])
 
+			#  Wrong input range
 			if attX > 4 or attX < 0 or attY > 4 or attX < 0:
 				print("Response coords must be 0-4 inclusive.")
 				pass
 			x = attX
 			y = attY
+			
+		#  Attempt game and see if we are done
 		gameComplete = guessCoordinate(x,y,board,keyCard)
 
 keyCard = {}
