@@ -1,14 +1,15 @@
 from gensim.models import Word2Vec
 import os
-import re
 import random
 import keyCardReader
+import datetime
 
-
+#  Read in the codenames
 codenameFile = open("codenameList.txt",'r')
 codenames = codenameFile.readlines()
 codenameFile.close()
 
+#  Parse the codenames
 codenameSentences = []
 for c in range(len(codenames)):
     codename = codenames[c] = codenames[c].strip()
@@ -16,15 +17,16 @@ for c in range(len(codenames)):
     codenameSentences.append([codename])
     codenames[c] = codename
 
+#  Read in the keycards
 keyCards = keyCardReader.readFromFile()
-keyCard = keyCards[int(random.random()*(len(keyCards)))]    
 
+#  Update this to keep our output straight
+versionNumber = "0.1"
+guesses = []
+    
 # trainedModelFile = "MODEL_FILE.txt"
 # model = Word2Vec.load(trainedModelFile)
 # print(c.most_similar('money', topn=5))
-
-
-
 
 def createBoard():
     longestWordLength = 1
@@ -55,17 +57,24 @@ def printBoard(board, longestWordLength):
         numberSpaces = longestWordLength - len(board[c])
         spaces = (numberSpaces+spacing) * ' '
         print("%s%s" % (board[c],spaces), end='')
+    
     print("")
 
-board, longestWordLength = createBoard()
-
 def generateHint(board, keyCard):
-    return "Ballroom 1"
+    hint = "ballroom"
+    numberReferences = 1
+    return (hint, numberReferences)
 
 def isGameComplete(board):
-    return 0
+    blueFound = 0 
+    redFound = 0
+    for codename in board:
+        blueFound += codename == "BLU"
+        redFound += codename == "RED"
+    print("You've found %i BLUE agents." % blueFound)
+    return blueFound == 9 or redFound == 8
 
-def guessCoordinate(z,board,keyCard):
+def guessCoordinate(z,board,keyCard, results):
     if board[z] == "NEU" or board[z] == "RED" or board[z]=="BLU" or board[z] =="DIE":
         print("You've already guessed %i,%i." % (x,y))
         return 0
@@ -73,23 +82,23 @@ def guessCoordinate(z,board,keyCard):
     agentType = keyCard[z]
     if agentType == 0:
         #  Neutral
-        print("%s was NEUTRAL! Too bad!\n" % board[z])
+        print("%s is NEUTRAL! What a waste of turn." % board[z])
         board[z] = "NEU"
     elif agentType == 1:
         #  Blue
-        print("%s was a BLU agent! Good job!\n" % board[z])
+        print("%s is a BLUE agent! Good job!" % board[z])
         board[z] = "BLU"
     elif agentType == 2:
         #  Red
-        print("%s was a RED agent! Too bad!\n" % board[z])
+        print("%s is a RED agent! Too bad!" % board[z])
         board[z] = "RED"
     else:
         #  Assassin
-        print("%s was an ASSASSIN! You lose!\n" % board[z])
+        print("%s is an ASSASSIN!" % board[z])
         board[z] = "DIE"
-        return 1
-        
-    return isGameComplete(board)
+
+    #  We found something, increment results
+    results[agentType] = results[agentType]+1
 
 def findCodenameCoord(response):
     for c in range(len(board)):
@@ -97,35 +106,67 @@ def findCodenameCoord(response):
             return c
     return -1
 
-def game(board,keyCard):
-    #  Welcome Message
-    print("Welcome to Codenames!\n")
-    print("Use the computer generated hints to try to find your agents!")
-    print("Input the codename you think the bot is referring to.\n")
+def isGameOver(results):
+    if results[1] == 9:
+        print("You found all the BLUE agents! You win!")
+        return 1
+    elif results[2] == 8:
+        print("All the RED agents were revealed! You lose!")
+        return 1
+    elif results[3] == 1:
+        print("You found the assassin. You lose.")
+        return 1
+    else:
+        return 0
 
+def writeResults(results):
+    date = datetime.datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
+    resultFileName = "output/%s-%s.txt" % (versionNumber,date)
+    
+    resultsFile = open(resultFileName,'w')
+
+    resultsFile.write("%i %i %i %i" % (results[0],results[1],results[2],results[3]))
+    for guess in guesses:
+        resultsFile.write("\n%s"%guess)
+
+    resultsFile.close()
+
+def game(board, keyCard, longestWordLength):
+    #  Welcome Message
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("Welcome to Codenames!\n")
+    print("Use the computer generated hints to try to find your BLUE agents!")
+    print("Input a codename you think the bot is referring to.\n")
+
+    #  Keeping track of score, neutral, blue, red, assassin
+    results = [0,0,0,0]
+    gameOver = 0
     #  Main game loop
-    gameComplete = 0
-    while not gameComplete:
+    while not gameOver:
         printBoard(board,longestWordLength)
-        print("\nHint: %s" % generateHint(board,keyCard))   
+        hintRef = generateHint(board,keyCard)
+        print("\nThe hint is \'%s\'. It refers to %i active codename(s)." % hintRef)   
         
         #  Keep looping until they give good input
         response = ""
         coord = -1
         while response == "" and coord == -1:
             attemptedResponse = input().lower()
-            if re.match("^[a-z]", attemptedResponse):
-                coord = findCodenameCoord(attemptedResponse)
-                if coord != -1:
-                    response = attemptedResponse
-                else:
-                    print("%s not found on board."%attemptedResponse)
+            coord = findCodenameCoord(attemptedResponse)
+            if coord != -1:
+                response = attemptedResponse
             else:
-                print("Incorrect input format.")
+                print("%s not found on board." % attemptedResponse)
 
-        #  Attempt game and see if we are done
+        guesses.append("%s %s" % (hintRef[0], response))
+
         os.system('cls' if os.name == 'nt' else 'clear')
-        gameComplete = guessCoordinate(coord,board,keyCard)
-        
-    print("Game Over! Thanks for playing!")
-game(board,keyCard)
+        guessCoordinate(coord, board, keyCard, results)
+        gameOver = isGameOver(results)
+
+    print("You found %i BLUE agents, %i RED agents, %i NEUTRALS, and %i ASSASSIN(s)" % (results[1],results[2],results[0],results[3]))
+    writeResults(results)
+
+board, longestWordLength = createBoard()
+keyCard = keyCards[int(random.random()*(len(keyCards)))]
+game(board,keyCard,longestWordLength)
