@@ -10,7 +10,7 @@ def verify(keyCard):
     counts = Counter(keyCard)
     return counts[0] == 7 and counts[1] == 9 and counts[2] == 8 and counts[3] == 1
 
-def main():
+def readFromFile():
     keyCards = []
     with open('codenameKeyCard20.txt', 'r') as keyCardFile:
         # First line contains number of key cards in the file
@@ -27,10 +27,10 @@ def main():
                 if verify(keyCard):
                     keyCards.append(keyCard)
                 count -= 1
+    return keyCards
 
+if __name__ == '__main__':
+    keyCards = readFromFile()
     print(len(keyCards))
     for kc in keyCards:
         print(kc)
-
-if __name__ == '__main__':
-    main()
