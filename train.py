@@ -120,7 +120,7 @@ def isGameOver(results):
         return 0
 
 def writeResults(results):
-    date = datetime.datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
+    date = datetime.datetime.now().strftime("%m_%d_%Y-%H_%M_%S")
     resultFileName = "output/%s-%s.txt" % (versionNumber,date)
     
     resultsFile = open(resultFileName,'w')
