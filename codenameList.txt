@@ -16,7 +16,6 @@ barbecue
 bathroom
 battery
 bed
-ee
 bible
 bird
 bomb
@@ -38,14 +37,13 @@ cave
 chair
 chief
 child
-choclates
+choclate
 church
 circle
 circus
 clock
 clown
 coffee
-coffee-shop
 comet
 cd
 compass
