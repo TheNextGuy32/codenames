@@ -1,8 +1,9 @@
-from gensim.models import Word2Vec
 import os
 import random
-import keyCardReader
 import datetime
+import hint
+import keyCardReader
+
 
 #  Read in the codenames
 codenameFile = open("codenameList.txt",'r')
@@ -59,11 +60,6 @@ def printBoard(board, longestWordLength):
         print("%s%s" % (board[c],spaces), end='')
     
     print("")
-
-def generateHint(board, keyCard):
-    hint = "ballroom"
-    numberReferences = 1
-    return (hint, numberReferences)
 
 def isGameComplete(board):
     blueFound = 0 
@@ -144,7 +140,7 @@ def game(board, keyCard, longestWordLength):
     #  Main game loop
     while not gameOver:
         printBoard(board,longestWordLength)
-        hintRef = generateHint(board,keyCard)
+        hintRef = hint.generateHint(board,keyCard)
         print("\nThe hint is \'%s\'. It refers to %i active codename(s)." % hintRef)   
         
         #  Keep looping until they give good input
