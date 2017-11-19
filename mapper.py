@@ -4,6 +4,12 @@ mapper.py
 This file handles the reading of map files.
 """
 
+from collections import Counter
+
+def verify(boardMap):
+    counts = Counter(boardMap)
+    return counts[0] == 7 and counts[1] == 9 and counts[2] == 8 and counts[3] == 1
+
 def main():
     maps = []
     with open('codenameMap20.txt', 'r') as mapFile:
@@ -18,12 +24,13 @@ def main():
                     rowStr = mapFile.readline().rstrip('\n').split()
                     rowInt = [int(rowStr[j]) for j in range(len(rowStr))]
                     boardMap = boardMap + rowInt
-                maps.append(boardMap)
+                if verify(boardMap):
+                    maps.append(boardMap)
                 count -= 1
 
+    print(len(maps))
     for m in maps:
         print(m)
-
 
 if __name__ == '__main__':
     main()
