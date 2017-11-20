@@ -101,3 +101,5 @@ ENV/
 .mypy_cache/
 
 dict2vec-vectors-dim300.vec
+
+output/
