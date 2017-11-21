@@ -37,7 +37,7 @@ cave
 chair
 chief
 child
-choclate
+chocolate
 church
 circle
 circus
