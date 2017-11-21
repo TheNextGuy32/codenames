@@ -4,6 +4,9 @@ try:
    import cPickle as pickle
 except:
    import pickle
+import os.path
+
+relationsFileName = "codenamesRelationList.p"
 
 '''
 Once you have your word embedding
@@ -62,7 +65,7 @@ def processWiki():
 
     #  Parse the codenames
     for c in range(len(codenames)):
-        codename = codenames[c] = codenames[c].strip()
+        codename = codenames[c].strip()
         
         suggestions = wikipedia.search(codename)
 
@@ -77,6 +80,7 @@ def processWiki():
 
         related = codename
         for suggestion in suggestions:
+            suggestion = suggestion.lower()
             if len(suggestion) < 3:
                 continue
 
@@ -117,15 +121,15 @@ def processWiki():
 
         print ("%s had %i links." % (codename, count))
     
-    relationsFile = open( "codenamesRelationList.p", "wb" ) 
+    relationsFile = open(relationsFileName, "wb" ) 
     pickle.dump(relations, relationsFile)
 
     return relations
 
 def getWikipediaRelations():
-    try:
-        return pickle.load(open( "codenamesRelationList.p", "rb" ))
-    except (OSError, IOError) as e:
+    if os.path.exists(relationsFileName):
+        return pickle.load(open(relationsFileName, "rb" ))
+    else:
         return processWiki()
 
-getWikipediaRelations()
+print(getWikipediaRelations())
