@@ -34,17 +34,36 @@ def tenMostSimilar(vector):
     similarWords.sort(key=lambda w: similarity(w.vector, vector), reverse=True)
     return similarWords[:10]
 
-def generateHint(words):
-    if len(words) > 0:
-        vectors = vectorize(words)
-        # Only generates hint for the first word in the list
-        similar = tenMostSimilar(vectors[0])
-        clues = [c.orth_ for c in similar]
+def chooseHint(candidates):
+    if len(candidates) > 0:
+        clues = [c.orth_ for c in candidates]
         for clue in clues:
             if not overlap(clue, words):
                 return clue
 
+def filterBoard(board, keyCard):
+    blues = []
+    reds = []
+    assassin = ''
+    for i in range(len(keyCard)):
+        if keyCard[i] == 3:
+            assassin = board[i]
+        elif keyCard[i] == 2:
+            reds.append(board[i])
+        elif keyCard[i] == 1:
+            blues.append(board[i])
+    blues = [b for b in blues if b != 'BLU']
+    reds = [r for r in reds if r != 'RED']
+    return blues, reds, assassin
+
+def generateHint(board, keyCard):
+    blues, reds, assassin = filterBoard(board, keyCard)
+    blueVectors = vectorize(blues)
+    redVectors = vectorize(reds)
+    assassin = vectorize([assassin])[0]
+
 if __name__ == '__main__':
-    words = ['clown', 'sphere', 'money']
-    hint = generateHint(words)
+    words = ['clown', 'sphere', 'money', 'box']
+    keyCard = [0, 1, 2, 3]
+    hint = generateHint(words, keyCard)
     print(hint)

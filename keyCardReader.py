@@ -2,6 +2,10 @@
 mapper.py
 
 This file handles the reading of key card files.
+0 represents Neutral
+1 represents Blue
+2 represents Red
+3 represents Assassin
 """
 
 from collections import Counter
