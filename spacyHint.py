@@ -16,7 +16,7 @@ def similarity(wv1, wv2):
         return 0.0
     return numpy.dot(wv1, wv2) / numpy.linalg.norm(wv1) * numpy.linalg.norm(wv2)
 
-def tenMostSimilar(vector, vectorModel):
+def tenMostSimilar(vector, words, vectorModel):
     """ Return the 10 most similar words compared to the given vector
     Adapted from wordembeddings lab from class
     """
@@ -122,7 +122,7 @@ def generateHint(board, keyCard):
     refs = selectReferences(blues, reds, 0.4)
     v = averageVector(refs)
     v -= assassin.vector
-    similar = tenMostSimilar(v, vectorModel)
+    similar = tenMostSimilar(v, board, vectorModel)
     hint = chooseHint(similar, board)
     return (hint.orth_, len(refs))
 
