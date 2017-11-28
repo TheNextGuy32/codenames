@@ -8,6 +8,8 @@ the words using spaCy word vector models.
 import spacy
 import numpy
 
+vectorModel = None
+
 def similarity(wv1, wv2):
     """ compare similarity between two numpy vectors
     Adapted from wordembeddings lab from class
@@ -117,7 +119,6 @@ def averageVector(words):
 def generateHint(board, keyCard):
     """ Generate a hint based on spaCy's word vector model.
     """
-    vectorModel = spacy.load('en_vectors_web_lg')
     blues, reds, assassin = filterBoard(board, keyCard, vectorModel)
     refs = selectReferences(blues, reds, 0.4)
     v = averageVector(refs)
@@ -126,8 +127,13 @@ def generateHint(board, keyCard):
     hint = chooseHint(similar, board)
     return (hint.orth_, len(refs))
 
+def loadModel():
+    global vectorModel
+    vectorModel = spacy.load('en_vectors_web_lg')
+
 if __name__ == '__main__':
     words = ['clown', 'sphere', 'money', 'cube', 'box']
     keyCard = [1, 1, 1, 2, 3]
+    loadModel()
     hint = generateHint(words, keyCard)
     print(hint)
