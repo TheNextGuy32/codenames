@@ -9,14 +9,16 @@ import itertools
 class TwitterPredictor():
     def __init__(self):
         self.model = pickle.load(open("twitter-model.p", "rb"))
+        #self.model = KeyedVectors.load_word2vec_format('gensim_model.txt', binary=False)
+        #pickle.dump(self.model, open("twitter-model.p", "wb"));
 
     def get_max(self, a, b):
         a_mod = 0
         b_mod = 0
         if len(a[0]) == 1:
-            a_mod = -0.2
+            a_mod = -0.5
         if len(b[0]) == 1:
-            b_mod = -0.2
+            b_mod = -0.5
         if a[1][1] + a_mod >= b[1][1] + b_mod:
             return a
         return b
@@ -28,7 +30,7 @@ class TwitterPredictor():
         return True
     
     def avg_distance(self, clue, target_words):
-        max_len = 3
+        max_len = 4
         dist = 0
         clue_sys = wordnet.synsets(clue)
         if len(clue_sys) > max_len:
@@ -65,7 +67,7 @@ class TwitterPredictor():
         
         filtered_out = list(filter(lambda x: len(x) > 0, out))
 
-        guesses = list(map(lambda x: (x, self.model.most_similar(positive=x, negative=negWords)), filtered_out))
+        guesses = list(map(lambda x: (x, self.model.most_similar_cosmul(positive=x, negative=negWords)), filtered_out))
         filtered_guesses = list(map(lambda x: (x[0], list(filter(lambda y: self.notOnBoard(y[0], all_words), x[1]))), guesses))
         #self.dump_guesses(filtered_guesses)
         filtered_guesses = list(map(lambda x: (x[0], sorted(map(lambda y: (y[0], y[1] + self.avg_distance(y[0], x[0])), x[1]), key=lambda z: z[1], reverse=True)), filtered_guesses))
