@@ -1,12 +1,14 @@
 import sys
 import os
+from spacyHint import SpacyClassifier
+from bot import Bot 
 
 def main():
     print('Welcome to Codenames')
     blu = input('Please input BLUE words (Space Separated): ').split(' ')
     red = input('Please input RED words (Space Separated): ').split(' ')
     black = input('Please input BLACK card: ')
-    neu = input('Please input NEUTRAL words (Space Separated): ')
+    neu = input('Please input NEUTRAL words (Space Separated): ').split(' ')
     while True:
         color = input('Which team is the bot playing for? (blue/red): ')
         if color == 'red' or color == 'blue':
@@ -21,6 +23,7 @@ def main():
     if (len(red) > len(blu)):
         if color == 'red':
             bot_turn = True
+    bot = Bot(color, SpacyClassifier())
     game_over = False 
     while not game_over:
         print('Current Board')
@@ -30,6 +33,7 @@ def main():
         if bot_turn:
             print('Bots turn!')
             print("Bot is generating hint...")
+            bot.generate_hint(blu, red, black, neu) 
             # Get hint
         else:
             print("Human player's turn!")

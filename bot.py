@@ -7,14 +7,19 @@ class Bot:
 
     def generate_hint(self, blue, red, black, words):
         positive = blue
-        negative = red + black
+        negative = red
 
         if (self.color == 'red'):
             postive = red
-            negative = blue + black
+            negative = blue 
 
         bad_words = words + self.hints_given
-        self.classifier.generate_hint(positive, negative, bad_words)
+        out = self.classifier.gen_hint(positive, negative, black, bad_words)
+        print(out)
+        self.hints_given += out[0]
+        return out
+
+
         
             
             

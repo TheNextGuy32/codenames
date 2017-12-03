@@ -28,8 +28,8 @@ class SpacyClassifier():
         for w in self.model.vocab:
             if (w.has_vector) and (w.orth_.islower()) and (w.lower_ not in words):
                 similarWords.append(w)
-        similarWords.sort(key=lambda w: similarity(w.vector, vector), reverse=True)
-        return similarWords[:10]
+        similarWords.sort(key=lambda w: self.similarity(w.vector, vector), reverse=True)
+        return similarWords
 
     def chooseHint(self, candidates, words):
         """ Pick the first candidate hint that does not overlap the
@@ -40,7 +40,7 @@ class SpacyClassifier():
         """
         if len(candidates) > 0:
             for clue in candidates:
-                if not overlap(clue.orth_, words):
+                if not self.overlap(clue.orth_, words):
                     return clue
 
     def overlap(self, hint, words):
@@ -126,7 +126,19 @@ class SpacyClassifier():
         v = self.averageVector(refs)
         v -= assassin.vector
         similar = self.tenMostSimilar(v, board)
-        hint = self.hooseHint(similar, board)
+        hint = self.chooseHint(similar, board)
+        return (hint.orth_, len(refs))
+    
+    def gen_hint(self, positives, negatives, black, words):
+        blues = [self.model.vocab[b] for b in positives]
+        reds = [self.model.vocab[r] for r in negatives]
+        assassin =  self.model.vocab[black]
+
+        refs = self.selectReferences(blues, reds, 0.4)
+        v = self.averageVector(refs)
+        v -= assassin.vector
+        similar = self.tenMostSimilar(v, words)
+        hint = self.chooseHint(similar, words)
         return (hint.orth_, len(refs))
 
 
