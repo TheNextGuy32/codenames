@@ -1,8 +1,11 @@
 import sys
+import random
 import os
 from spacyHint import SpacyClassifier
 from twitterPredictor import TwitterPredictor
 from bot import Bot 
+import keyCardReader
+
 
 def pick_bot(bot_type):
     if (bot_type == 'spacy'):
@@ -11,20 +14,7 @@ def pick_bot(bot_type):
         return TwitterPredictor()
         
 
-def main():
-    print('Welcome to Codenames')
-    bot_type = input ('Select predictor type (spacy, twitter, wiki): ')
-    blu = input('Please input BLUE words (Space Separated): ').split(' ')
-    red = input('Please input RED words (Space Separated): ').split(' ')
-    black = input('Please input BLACK card: ')
-    neu = input('Please input NEUTRAL words (Space Separated): ').split(' ')
-    while True:
-        color = input('Which team is the bot playing for? (blue/red): ')
-        if color == 'red' or color == 'blue':
-            break;
-        else:
-            print('Invalid Input')
-
+def start(blu, red, black, neu, bot_type, color):
     bot_turn = False
     if (len(blu) > len(red)):
         if color == 'blue':
@@ -70,5 +60,74 @@ def main():
         print('BOT WINS')
     else:
         print('HUMAN WINS')
-                    
-main()
+
+def createBoard(codenames):
+    longestWordLength = 1
+    board = [""] * 25 
+    freeCodename = [1]  * len(codenames)
+    for i in range(25):
+        while 1:
+            codenameIndex = int(random.random()*(len(codenames)))   
+            if freeCodename[codenameIndex]:
+                board[i] = codenames[codenameIndex]
+                longestWordLength = max(longestWordLength,len(board[i]))
+                freeCodename[codenameIndex] = 0
+                break
+    return (board,longestWordLength)
+
+def get_card_input():
+    if (len(sys.argv) == 2 and sys.argv[1] == "-demo"):
+        #  Read in the codenames
+        codenameFile = open("codenameList.txt",'r')
+        codenames = codenameFile.readlines()
+        codenameFile.close()
+
+        #  Parse the codenames
+        codenameSentences = []
+        for c in range(len(codenames)):
+            codename = codenames[c] = codenames[c].strip()
+
+            codenameSentences.append([codename])
+            codenames[c] = codename
+
+        #  Read in the keycards
+        keyCards = keyCardReader.readFromFile()
+        board, longestWordLength = createBoard(codenames)
+        keyCard = keyCards[int(random.random()*(len(keyCards)))]
+        blu = []
+        red = []
+        black = ''
+        neu = []
+        for i in range(len(keyCard)):
+            if keyCard[i] == 3:
+                black = board[i]
+            elif keyCard[i] == 2:
+                red.append(board[i])
+            elif keyCard[i] == 1:
+                blu.append(board[i])
+            else:
+                neu.append(board[i])
+
+    else:
+        blu = input('Please input BLUE words (Space Separated): ').split(' ')
+        red = input('Please input RED words (Space Separated): ').split(' ')
+        black = input('Please input BLACK card: ')
+        neu = input('Please input NEUTRAL words (Space Separated): ').split(' ')
+
+    return blu, red, black, neu
+
+def main():
+    print('Welcome to Codenames')
+    bot_type = input ('Select predictor type (spacy, twitter, wiki): ')
+    blu, red, black, neu = get_card_input()
+    while True:
+        color = input('Which team is the bot playing for? (blue/red): ')
+        if color == 'red' or color == 'blue':
+            break;
+        else:
+            print('Invalid Input')
+    start(blu, red, black, neu, bot_type, color)
+
+
+if __name__ == "__main__":
+    main()

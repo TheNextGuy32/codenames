@@ -5,7 +5,6 @@ from nltk.corpus import wordnet
 import pickle
 import itertools
 
-
 class TwitterPredictor():
     def __init__(self):
         self.model = pickle.load(open("twitter-model.p", "rb"))
@@ -29,7 +28,7 @@ class TwitterPredictor():
                 return False
         return True
     
-    def avg_distance(self, clue, target_words):
+    def avg_distance(self, clue, target_words, negative):
         max_len = 4
         dist = 0
         clue_sys = wordnet.synsets(clue)
@@ -48,7 +47,8 @@ class TwitterPredictor():
                 best = 0
             dist += best
         
-        return dist / len(target_words)
+        similarity = self.model.n_similarity([clue], negative)
+        return (dist / len(target_words)) - similarity
     
     def dump_guesses(self, guesses):
         for guess in guesses:
@@ -71,7 +71,7 @@ class TwitterPredictor():
         guesses = list(map(lambda x: (x, self.model.most_similar_cosmul(positive=x)), filtered_out))
         filtered_guesses = list(map(lambda x: (x[0], list(filter(lambda y: self.notOnBoard(y[0], all_words), x[1]))), guesses))
         #self.dump_guesses(filtered_guesses)
-        filtered_guesses = list(filter(lambda y: len(y[1]) > 0, map(lambda x: (x[0], sorted(map(lambda y: (y[0], y[1] + self.avg_distance(y[0], x[0])), x[1]), key=lambda z: z[1], reverse=True)), filtered_guesses)))
+        filtered_guesses = list(filter(lambda y: len(y[1]) > 0, map(lambda x: (x[0], sorted(map(lambda y: (y[0], y[1] + self.avg_distance(y[0], x[0], negWords)), x[1]), key=lambda z: z[1], reverse=True)), filtered_guesses)))
         #self.dump_guesses(filtered_guesses)
 
         if len(filtered_guesses) == 1:
@@ -84,7 +84,7 @@ class TwitterPredictor():
 def main():
     pred = TwitterPredictor()
     print('cream' in 'ice')
-    hint = pred.gen_hint(['spy', 'school'], ['princess', 'state', 'water', 'himalayas', 'dress', 'pie', 'spring', 'air', 'paper'], 'bed', [])
+    hint = pred.gen_hint(['spy', 'carrot', 'sink', 'mole', 'school', 'tag', 'casino', 'scorpion'], ['princess', 'state', 'water', 'himalayas', 'dress', 'pie', 'spring', 'air', 'paper'], 'bed', [])
     print(hint)
     # print(not any(word in ''))
 
