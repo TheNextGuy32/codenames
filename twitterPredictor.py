@@ -9,8 +9,8 @@ import itertools
 class TwitterPredictor():
     def __init__(self):
         self.model = pickle.load(open("twitter-model.p", "rb"))
-        #self.model = KeyedVectors.load_word2vec_format('gensim_model.txt', binary=False)
-        #pickle.dump(self.model, open("twitter-model.p", "wb"));
+        #self.model = KeyedVectors.load_word2vec_format('crawl-vectors.txt', binary=False)
+        #pickle.dump(self.model, open("crawl-model.p", "wb"));
 
     def get_max(self, a, b):
         a_mod = 0
@@ -58,19 +58,20 @@ class TwitterPredictor():
             print('')
         print('\n\n')
     
-    def generateHint(self, posWords, negWords):
-        all_words = posWords + negWords
+    def gen_hint(self, posWords, negWords, black, words):
+        all_words = posWords + negWords + words + [black]
+        #all_words = []
         out = []
-        for i in range(0, len(posWords) + 1):
+        for i in range(0, min(4, len(posWords) + 1)):
             temp = [list(x) for x in itertools.combinations(posWords, i)]
             out.extend(temp)
         
         filtered_out = list(filter(lambda x: len(x) > 0, out))
 
-        guesses = list(map(lambda x: (x, self.model.most_similar_cosmul(positive=x, negative=negWords)), filtered_out))
+        guesses = list(map(lambda x: (x, self.model.most_similar_cosmul(positive=x)), filtered_out))
         filtered_guesses = list(map(lambda x: (x[0], list(filter(lambda y: self.notOnBoard(y[0], all_words), x[1]))), guesses))
         #self.dump_guesses(filtered_guesses)
-        filtered_guesses = list(map(lambda x: (x[0], sorted(map(lambda y: (y[0], y[1] + self.avg_distance(y[0], x[0])), x[1]), key=lambda z: z[1], reverse=True)), filtered_guesses))
+        filtered_guesses = list(filter(lambda y: len(y[1]) > 0, map(lambda x: (x[0], sorted(map(lambda y: (y[0], y[1] + self.avg_distance(y[0], x[0])), x[1]), key=lambda z: z[1], reverse=True)), filtered_guesses)))
         #self.dump_guesses(filtered_guesses)
 
         if len(filtered_guesses) == 1:
@@ -83,7 +84,8 @@ class TwitterPredictor():
 def main():
     pred = TwitterPredictor()
     print('cream' in 'ice')
-    pred.generateHint(['apple', 'fruit', 'rock'], [])
+    hint = pred.gen_hint(['spy', 'school'], ['princess', 'state', 'water', 'himalayas', 'dress', 'pie', 'spring', 'air', 'paper'], 'bed', [])
+    print(hint)
     # print(not any(word in ''))
 
 if __name__ == "__main__":

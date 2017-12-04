@@ -1,10 +1,19 @@
 import sys
 import os
 from spacyHint import SpacyClassifier
+from twitterPredictor import TwitterPredictor
 from bot import Bot 
+
+def pick_bot(bot_type):
+    if (bot_type == 'spacy'):
+        return SpacyClassifier()
+    elif (bot_type == 'twitter'):
+        return TwitterPredictor()
+        
 
 def main():
     print('Welcome to Codenames')
+    bot_type = input ('Select predictor type (spacy, twitter, wiki): ')
     blu = input('Please input BLUE words (Space Separated): ').split(' ')
     red = input('Please input RED words (Space Separated): ').split(' ')
     black = input('Please input BLACK card: ')
@@ -23,7 +32,7 @@ def main():
     if (len(red) > len(blu)):
         if color == 'red':
             bot_turn = True
-    bot = Bot(color, SpacyClassifier())
+    bot = Bot(color, pick_bot(bot_type) )
     game_over = False 
     while not game_over:
         print('Current Board')
@@ -33,7 +42,7 @@ def main():
         if bot_turn:
             print('Bots turn!')
             print("Bot is generating hint...")
-            bot.generate_hint(blu, red, black, neu) 
+            print(bot.generate_hint(blu, red, black, neu))
             # Get hint
         else:
             print("Human player's turn!")

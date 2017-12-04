@@ -14,9 +14,9 @@ class Bot:
             negative = blue 
 
         bad_words = words + self.hints_given
-        out = self.classifier.gen_hint(positive, negative, black, bad_words)
-        print(out)
-        self.hints_given += out[0]
+        out, target = self.classifier.gen_hint(positive, negative, black, bad_words)
+        print(target)
+        self.hints_given.append(out[0])
         return out
 
 
