@@ -3,6 +3,7 @@ import random
 import datetime
 import hint
 import keyCardReader
+from twitterPredictor import TwitterPredictor
 
 
 #  Read in the codenames
@@ -133,14 +134,16 @@ def game(board, keyCard, longestWordLength):
     print("Welcome to Codenames!\n")
     print("Use the computer generated hints to try to find your BLUE agents!")
     print("Input a codename you think the bot is referring to.\n")
+    model = TwitterPredictor()
 
     #  Keeping track of score, neutral, blue, red, assassin
     results = [0,0,0,0]
     gameOver = 0
+    player = 1
     #  Main game loop
     while not gameOver:
         printBoard(board,longestWordLength)
-        hintRef = hint.generateHint(board,keyCard)
+        hintRef, bot_clues = hint.generateHint(player,board,keyCard,model)
         print("\nThe hint is \'%s\'. It refers to %i active codename(s)." % hintRef)   
         
         #  Keep looping until they give good input
@@ -157,6 +160,7 @@ def game(board, keyCard, longestWordLength):
         guesses.append("%s %s" % (hintRef[0], response))
 
         os.system('cls' if os.name == 'nt' else 'clear')
+        print("The bot was thinking of {} with the clue {}".format(bot_clues, hintRef[0]))
         guessCoordinate(coord, board, keyCard, results)
         gameOver = isGameOver(results)
 
