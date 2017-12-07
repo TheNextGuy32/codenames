@@ -25,13 +25,11 @@ class SpacyClassifier():
         Adapted from wordembeddings lab from class
         """
         similarWords = []
-        """
         for w in self.model.vocab:
             if (w.has_vector) and (w.orth_.islower()) and (w.lower_ not in words):
                 similarWords.append(w)
         similarWords.sort(key=lambda w: self.similarity(w.vector, vector), reverse=True)
-        """
-        return self.model.most_similar(vector)
+        return similarWords[:10]
 
     def chooseHint(self, candidates, words):
         """ Pick the first candidate hint that does not overlap the
@@ -94,10 +92,6 @@ class SpacyClassifier():
             for j in range(len(blues)):
                 if i != j:
                     bj = blues[j]
-                    print(bi.text)
-                    print(bj.text)
-                    print(bi.similarity(bj))
-                    print('')
                     if bi.similarity(bj) > threshold:
                         plus[bi].append(bj)
             for k in range(len(reds)):
@@ -107,8 +101,6 @@ class SpacyClassifier():
                         minus[bi].append(rk)
             score[bi] = len(plus[bi]) - len(minus[bi])
         scoreVals = list(score.values())
-        print(score)
-        print(plus)
         bestScoreIndex = scoreVals.index(max(scoreVals))
         bestKey = list(score.keys())[bestScoreIndex]
         return [bestKey] + plus[bestKey]
@@ -131,11 +123,9 @@ class SpacyClassifier():
         """
         blues, reds, assassin = self.filterBoard(board, keyCard)
         refs = self.selectReferences(blues, reds, 0.4)
-        print(refs)
         #v = self.averageVector(refs)
         #v -= assassin.vector
         similar = self.tenMostSimilar(refs, board)
-        print(similar)
         hint = self.chooseHint(similar, board)
         return (hint.orth_, len(refs))
     

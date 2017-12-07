@@ -1,10 +1,16 @@
 import os
+import sys
 import random
 import datetime
 import hint
 import keyCardReader
 from twitterPredictor import TwitterPredictor
+from spacyHint import SpacyClassifier
 
+model_type = "t"
+if len(sys.argv) > 1:
+    if sys.argv[1] == "-s":
+        model_type = "s"
 
 #  Read in the codenames
 codenameFile = open("codenameList.txt",'r')
@@ -134,7 +140,10 @@ def game(board, keyCard, longestWordLength):
     print("Welcome to Codenames!\n")
     print("Use the computer generated hints to try to find your BLUE agents!")
     print("Input a codename you think the bot is referring to.\n")
-    model = TwitterPredictor()
+    if model_type == "t":
+        model = TwitterPredictor()
+    else:
+        model = SpacyClassifier()
 
     #  Keeping track of score, neutral, blue, red, assassin
     results = [0,0,0,0]
