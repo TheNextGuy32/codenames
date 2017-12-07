@@ -133,13 +133,15 @@ class SpacyClassifier():
         blues = [self.model.vocab[b] for b in positives]
         reds = [self.model.vocab[r] for r in negatives]
         assassin =  self.model.vocab[black]
+        board = positives + negatives + words
+        board.append(black)
 
         refs = self.selectReferences(blues, reds, 0.4)
         v = self.averageVector(refs)
         v -= assassin.vector
-        similar = self.tenMostSimilar(v, words)
-        hint = self.chooseHint(similar, words)
-        return (hint.orth_, len(refs))
+        similar = self.tenMostSimilar(v, board)
+        hint = self.chooseHint(similar, board)
+        return (hint.orth_, len(refs)), [r.orth_ for r in refs]
 
 
 if __name__ == '__main__':
