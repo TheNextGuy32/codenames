@@ -143,7 +143,7 @@ def game(board, keyCard, longestWordLength):
     #  Main game loop
     while not gameOver:
         printBoard(board,longestWordLength)
-        hintRef, bot_clues = hint.generateHint(player,board,keyCard,model)
+        hintRef, bot_clues = hint.gen_hint(player,board,keyCard,model)
         print("\nThe hint is \'%s\'. It refers to %i active codename(s)." % hintRef)   
         
         #  Keep looping until they give good input
