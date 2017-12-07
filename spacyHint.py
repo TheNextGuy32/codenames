@@ -123,9 +123,9 @@ class SpacyClassifier():
         """
         blues, reds, assassin = self.filterBoard(board, keyCard)
         refs = self.selectReferences(blues, reds, 0.4)
-        #v = self.averageVector(refs)
-        #v -= assassin.vector
-        similar = self.tenMostSimilar(refs, board)
+        v = self.averageVector(refs)
+        v -= assassin.vector
+        similar = self.tenMostSimilar(v, board)
         hint = self.chooseHint(similar, board)
         return (hint.orth_, len(refs))
     

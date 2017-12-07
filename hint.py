@@ -8,4 +8,6 @@ def gen_hint(player, board, keyCard, model):
     negative = list(map(lambda y: y[0], filter(lambda x: x[0] not in ignored_words and x[1] != player, zipped)))
     neutral = list(map(lambda y: y[0], filter(lambda x: x[0] not in ignored_words and x[1] == 0, zipped)))
     die = list(map(lambda y: y[0], filter(lambda x: x[0] not in ignored_words and x[1] == 3, zipped)))[0]
-    return model.gen_hint(positive, negative, die, neutral)
+    hint = model.gen_hint(positive, negative, die, neutral)
+    print(hint)
+    return hint
