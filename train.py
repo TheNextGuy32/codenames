@@ -42,7 +42,7 @@ def createBoard():
     freeCodename = [1]  * len(codenames)
     for i in range(25):
         while 1:
-            codenameIndex = int(random.random()*(len(codenames)))   
+            codenameIndex = random.randrange(len(codenames))
             if freeCodename[codenameIndex]:
                 board[i] = codenames[codenameIndex]
                 longestWordLength = max(longestWordLength,len(board[i]))
@@ -177,5 +177,5 @@ def game(board, keyCard, longestWordLength):
     writeResults(results)
 
 board, longestWordLength = createBoard()
-keyCard = keyCards[int(random.random()*(len(keyCards)))]
+keyCard = random.choice(keyCards)
 game(board,keyCard,longestWordLength)
