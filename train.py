@@ -17,6 +17,8 @@ codenameFile = open("codenameList.txt",'r')
 codenames = codenameFile.readlines()
 codenameFile.close()
 
+random.seed()
+
 #  Parse the codenames
 codenameSentences = []
 for c in range(len(codenames)):
