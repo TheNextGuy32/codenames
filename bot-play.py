@@ -118,7 +118,7 @@ def get_card_input():
 
 def main():
     print('Welcome to Codenames')
-    bot_type = input ('Select predictor type (spacy, twitter, wiki): ')
+    bot_type = input ('Select predictor type (spacy, twitter): ')
     blu, red, black, neu = get_card_input()
     while True:
         color = input('Which team is the bot playing for? (blue/red): ')
